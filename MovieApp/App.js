@@ -8,12 +8,16 @@
 
 import React, {Component} from 'react';
 import { SearchBar } from 'react-native-elements';
-import {Platform, StyleSheet, Text, View, Button} from 'react-native';
+import { Platform, StyleSheet, View, ScrollView } from 'react-native';
 import MovieList from './components/MovieList';
 
+// URL constants
 const DB_URL = "https://extension-cb205.firebaseio.com/Movies.json";
 const API_URL = "http://www.omdbapi.com/";
 const API_KEY = "798fba18";
+
+// Default placeholder picture
+const DEFAULT_PIC_URL = "https://www.pexels.com/photo/brown-rocky-mountain-photography-2098427/";
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -29,11 +33,24 @@ export default class App extends Component<Props> {
     searchString: ''
   }
 
-  fetchMovies = (title) => {
+  fetchMovies = title => {
     fetch(API_URL + "?s=" + title + "&type=&apikey=" + API_KEY)
      .then(res => res.json())
      .then(moviesJson => {
-       console.log(moviesJson)
+       let searchResults = moviesJson['Search'];
+       let retrievedMovies = [];
+       if( searchResults !== 'undefined' && searchResults ) {
+         for(let i = 0; i < searchResults.length; i++) {
+          retrievedMovies.push({
+             id: searchResults[i].imdbID,
+             title: searchResults[i].Title,
+             releaseYear: searchResults[i].Year,
+             icon: searchResults[i].Poster === 'N/A' ? DEFAULT_PIC_URL : searchResults[i].Poster
+           })
+         }
+       }
+       console.log(retrievedMovies);
+       this.setState({ movies: retrievedMovies });
      })
      .catch(err => console.log(err));
   }
@@ -43,17 +60,24 @@ export default class App extends Component<Props> {
     this.fetchMovies(search);
   }
 
+  handleTitleClick = movieId => {
+    // TODO: Retrieve data and open a new view for the user
+  }
+
   render() {
     return (
-      <View style={styles.container}>
+      <ScrollView>
         <SearchBar 
           platform="android"
           placeholder="Search"
           onChangeText={this.handleMovieTitleChange}
           value={this.state.searchString}
         />
-        <MovieList movies={this.state.movies} />
-      </View>
+        <MovieList 
+          movies={this.state.movies}
+          handleDetailsRetrieval={this.handleTitleClick}
+        />
+      </ScrollView>
     );
   }
 }
