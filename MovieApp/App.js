@@ -7,7 +7,13 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import { SearchBar } from 'react-native-elements';
+import {Platform, StyleSheet, Text, View, Button} from 'react-native';
+import MovieList from './components/MovieList';
+
+const DB_URL = "https://extension-cb205.firebaseio.com/Movies.json";
+const API_URL = "http://www.omdbapi.com/";
+const API_KEY = "798fba18";
 
 const instructions = Platform.select({
   ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
@@ -18,12 +24,35 @@ const instructions = Platform.select({
 
 type Props = {};
 export default class App extends Component<Props> {
+  state = {
+    movies: [],
+    searchString: ''
+  }
+
+  fetchMovies = (title) => {
+    fetch(API_URL + "?s=" + title + "&type=&apikey=" + API_KEY)
+     .then(res => res.json())
+     .then(moviesJson => {
+       console.log(moviesJson)
+     })
+     .catch(err => console.log(err));
+  }
+
+  handleMovieTitleChange = search => {
+    this.setState({ searchString: search })
+    this.fetchMovies(search);
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
+        <SearchBar 
+          platform="android"
+          placeholder="Search"
+          onChangeText={this.handleMovieTitleChange}
+          value={this.state.searchString}
+        />
+        <MovieList movies={this.state.movies} />
       </View>
     );
   }
@@ -45,5 +74,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333333',
     marginBottom: 5,
-  },
+  }
 });
