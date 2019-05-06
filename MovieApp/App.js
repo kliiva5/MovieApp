@@ -11,10 +11,14 @@ import { SearchBar } from 'react-native-elements';
 import { Platform, StyleSheet, View, ScrollView } from 'react-native';
 import MovieList from './components/MovieList';
 
+import {firebaseConfig, API_KEY, API_URL} from './config';
+
+import * as firebase from "firebase/app";
+import "firebase/auth";
+import "firebase/database";
+
 // URL constants
-const DB_URL = "https://extension-cb205.firebaseio.com/Movies.json";
-const API_URL = "http://www.omdbapi.com/";
-const API_KEY = "798fba18";
+
 
 // Default placeholder picture
 const DEFAULT_PIC_URL = "https://www.pexels.com/photo/brown-rocky-mountain-photography-2098427/";
@@ -26,11 +30,21 @@ const instructions = Platform.select({
     'Shake or press menu button for dev menu',
 });
 
+const fireBase = firebase.initializeApp(firebaseConfig);
+
 type Props = {};
 export default class App extends Component<Props> {
   state = {
     movies: [],
     searchString: ''
+  }
+
+  favorite(movie) {
+    var ref = fireBase.database().ref("movies/" + movie + '/favorite');
+    ref.once("value")
+    .then(function(snapshot) {
+      snapshot.val() ? ref.set(false) : ref.set(true)
+    });
   }
 
   fetchMovies = title => {
