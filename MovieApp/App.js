@@ -10,6 +10,7 @@ import React, {Component} from 'react';
 import { SearchBar } from 'react-native-elements';
 import { Platform, StyleSheet, View, ScrollView } from 'react-native';
 import MovieList from './components/MovieList';
+import MovieDetails from './components/MovieDetails';
 
 import {firebaseConfig, API_KEY, API_URL} from './config';
 
@@ -31,12 +32,14 @@ const instructions = Platform.select({
 });
 
 const fireBase = firebase.initializeApp(firebaseConfig);
-
+console.log("siin");
 type Props = {};
 export default class App extends Component<Props> {
   state = {
     movies: [],
-    searchString: ''
+    searchString: '',
+    movieDetails: [],
+    detailsVisible: false
   }
 
   favorite(movie) {
@@ -69,29 +72,60 @@ export default class App extends Component<Props> {
      .catch(err => console.log(err));
   }
 
+
   handleMovieTitleChange = search => {
     this.setState({ searchString: search })
     this.fetchMovies(search);
   }
 
   handleTitleClick = movieId => {
-    // TODO: Retrieve data and open a new view for the user
+    fetch(API_URL + "?i=" + movieId + "&apiKey=" + API_KEY)
+      .then(res => res.json())
+      .then(movieDetails => {
+        if(movieDetails) {
+          // Put into state, or directly pass them to the component
+          let movieInfo = [];
+          
+          for( let i = 0; i < movieDetails.length; i++) {
+            movieInfo.push({
+              title: movieDetails['Title'],
+              year: movieDetails['Year'],
+              released: movieDetails['Released'],
+              runtime: movieDetails['Runtime']
+              // And so on
+            })
+          }
+          this.setState({
+            detailsVisible: true,
+            movieDetails: movieInfo
+          });
+        } else {
+          this.setState({ detailsVisible: false });
+        }
+      })
+      .catch(err => console.log(err));
   }
 
   render() {
     return (
-      <ScrollView>
-        <SearchBar 
-          platform="android"
-          placeholder="Search"
-          onChangeText={this.handleMovieTitleChange}
-          value={this.state.searchString}
-        />
-        <MovieList 
-          movies={this.state.movies}
-          handleDetailsRetrieval={this.handleTitleClick}
-        />
-      </ScrollView>
+      <View>
+        <ScrollView>
+          <SearchBar 
+            platform="android"
+            placeholder="Search"
+            onChangeText={this.handleMovieTitleChange}
+            value={this.state.searchString}
+          />
+          <MovieList 
+            movies={this.state.movies}
+            handleDetailsRetrieval={this.handleTitleClick}
+          />
+          <ScrollView>
+            <MovieDetails details={this.state.movieDetails} /> 
+          </ScrollView>
+        </ScrollView>
+        
+      </View>
     );
   }
 }
