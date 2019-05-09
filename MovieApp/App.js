@@ -7,8 +7,10 @@
  */
 
 import React, {Component} from 'react';
-import { SearchBar } from 'react-native-elements';
-import { Platform, StyleSheet, View, ScrollView } from 'react-native';
+import { SearchBar, ListItem, Card } from 'react-native-elements';
+import { Platform, StyleSheet, View, ScrollView, Text, Button } from 'react-native';
+import { createStackNavigator, createAppContainer, StackActions, NavigationActions } from 'react-navigation'
+
 import MovieList from './components/MovieList';
 import MovieDetails from './components/MovieDetails';
 
@@ -17,9 +19,6 @@ import {firebaseConfig, API_KEY, API_URL} from './config';
 import * as firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/database";
-
-// URL constants
-
 
 // Default placeholder picture
 const DEFAULT_PIC_URL = "https://www.pexels.com/photo/brown-rocky-mountain-photography-2098427/";
@@ -32,22 +31,25 @@ const instructions = Platform.select({
 });
 
 const fireBase = firebase.initializeApp(firebaseConfig);
-console.log("siin");
-type Props = {};
-export default class App extends Component<Props> {
+class SearchScreen extends React.Component {
   state = {
     movies: [],
-    searchString: '',
-    movieDetails: [],
-    detailsVisible: false
+    search: "",
   }
-
-  favorite(movie) {
-    var ref = fireBase.database().ref("movies/" + movie + '/favorite');
-    ref.once("value")
-    .then(function(snapshot) {
-      snapshot.val() ? ref.set(false) : ref.set(true)
-    });
+  
+  handleDetailsRetrieval = movieId => {
+    fetch(API_URL + "?i=" + movieId + "&apiKey=" + API_KEY)
+      .then(res => res.json())
+      .then(movieDetails => {
+        this.props.navigation.navigate('Details', {
+          title: movieDetails.Title,
+          year: movieDetails.Year,
+          runtime: movieDetails.Runtime,
+          plot: movieDetails.Plot,
+          poster: movieDetails.Poster === 'N/A' ? DEFAULT_PIC_URL : movieDetails.Poster
+        })
+      })
+      .catch(err => console.log(err));
   }
 
   fetchMovies = title => {
@@ -66,69 +68,73 @@ export default class App extends Component<Props> {
            })
          }
        }
-       console.log(retrievedMovies);
        this.setState({ movies: retrievedMovies });
      })
      .catch(err => console.log(err));
   }
 
-
-  handleMovieTitleChange = search => {
-    this.setState({ searchString: search })
+  updateSearch = search => {
+    this.setState({ search });
     this.fetchMovies(search);
-  }
-
-  handleTitleClick = movieId => {
-    fetch(API_URL + "?i=" + movieId + "&apiKey=" + API_KEY)
-      .then(res => res.json())
-      .then(movieDetails => {
-        if(movieDetails) {
-          // Put into state, or directly pass them to the component
-          let movieInfo = [];
-          
-          for( let i = 0; i < movieDetails.length; i++) {
-            movieInfo.push({
-              title: movieDetails['Title'],
-              year: movieDetails['Year'],
-              released: movieDetails['Released'],
-              runtime: movieDetails['Runtime']
-              // And so on
-            })
-          }
-          this.setState({
-            detailsVisible: true,
-            movieDetails: movieInfo
-          });
-        } else {
-          this.setState({ detailsVisible: false });
-        }
-      })
-      .catch(err => console.log(err));
   }
 
   render() {
     return (
-      <View>
-        <ScrollView>
-          <SearchBar 
-            platform="android"
-            placeholder="Search"
-            onChangeText={this.handleMovieTitleChange}
-            value={this.state.searchString}
-          />
-          <MovieList 
-            movies={this.state.movies}
-            handleDetailsRetrieval={this.handleTitleClick}
-          />
-          <ScrollView>
-            <MovieDetails details={this.state.movieDetails} /> 
-          </ScrollView>
-        </ScrollView>
-        
-      </View>
+      <ScrollView>
+        <SearchBar 
+          placeholder="Search for movies..."
+          platform="android"
+          onChangeText={this.updateSearch}
+          value={this.state.search}
+        />
+        {
+          this.state.movies.map((movie, i) =>
+            <ListItem 
+                key={i}
+                title={movie.title}
+                subtitle={movie.releaseYear}
+                leftAvatar={{
+                    source: { uri: movie.icon }
+                }}
+                onPress={() => this.handleDetailsRetrieval(movie.id)}
+            />
+          )
+        }
+      </ScrollView>
     );
   }
 }
+
+class MovieDetailsScreen extends React.Component {
+  render() {
+    const { navigation } = this.props;
+    const movieTitle = navigation.getParam('title');
+    const movieYear = navigation.getParam('year');
+    const movieRunTime = navigation.getParam('runtime');
+    const moviePlot = navigation.getParam('plot');
+    const moviePoster = navigation.getParam('poster');
+
+    return (
+      <Card
+        title={movieTitle + " " + "(" + movieYear + ")"}
+        image={{ uri: moviePoster }}>
+        <Text style={{marginBottom: 10}}>
+          { moviePlot }
+        </Text>
+      </Card>
+    );
+  }
+}
+
+const AppNavigator = createStackNavigator(
+  {
+    Search: SearchScreen,
+    Details: MovieDetailsScreen
+  }, 
+  {
+    initialRouteName: 'Search'
+  }
+);
 
 const styles = StyleSheet.create({
   container: {
@@ -148,3 +154,5 @@ const styles = StyleSheet.create({
     marginBottom: 5,
   }
 });
+
+export default createAppContainer(AppNavigator);
