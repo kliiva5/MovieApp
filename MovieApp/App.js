@@ -7,12 +7,9 @@
  */
 
 import React, {Component} from 'react';
-import { SearchBar, ListItem, Card } from 'react-native-elements';
+import { SearchBar, ListItem, Card, Icon } from 'react-native-elements';
 import { Platform, StyleSheet, View, ScrollView, Text, Button } from 'react-native';
 import { createStackNavigator, createAppContainer, StackActions, NavigationActions } from 'react-navigation'
-
-import MovieList from './components/MovieList';
-import MovieDetails from './components/MovieDetails';
 
 import {firebaseConfig, API_KEY, API_URL} from './config';
 
@@ -42,6 +39,7 @@ class SearchScreen extends React.Component {
       .then(res => res.json())
       .then(movieDetails => {
         this.props.navigation.navigate('Details', {
+          id: movieDetails.imdbID,
           title: movieDetails.Title,
           year: movieDetails.Year,
           runtime: movieDetails.Runtime,
@@ -106,8 +104,52 @@ class SearchScreen extends React.Component {
 }
 
 class MovieDetailsScreen extends React.Component {
+  constructor() {
+    super()
+    this.isFav = this.isFav.bind(this)
+}
+  state = {
+    fav: false,
+  }
+  
+  favourite(id) {
+    var ref = fireBase.database().ref("movies/" + id + '/favourite');
+    ref.once("value")
+    .then(function(snapshot) {
+      snapshot.val() ? ref.set(false) : ref.set(true)
+    });
+ 
+    this.isFav(id);
+
+    var movie = fireBase.database().ref("movies/" + id);
+    const { navigation } = this.props;
+    const movieTitle = navigation.getParam('title');
+    const movieYear = navigation.getParam('year');
+    const moviePoster = navigation.getParam('poster');
+    
+    movie.set(({
+      favourite: this.state.fav,
+      title: movieTitle,
+      year: movieYear,
+      poster: moviePoster
+    }));
+
+  }
+
+  isFav(id) {
+    let movieFav = true;
+    var isFav = firebase.database().ref('movies/' + id + '/favourite');
+    isFav.on('value', function(snapshot) {
+        movieFav = snapshot.val();
+      });
+    this.setState({fav: movieFav});
+  }
+
+
+
   render() {
     const { navigation } = this.props;
+    const movieId = navigation.getParam('id');
     const movieTitle = navigation.getParam('title');
     const movieYear = navigation.getParam('year');
     const movieRunTime = navigation.getParam('runtime');
@@ -117,7 +159,15 @@ class MovieDetailsScreen extends React.Component {
     return (
       <Card
         title={movieTitle + " " + "(" + movieYear + ")"}
+        
         image={{ uri: moviePoster }}>
+        
+        <Icon
+          raised
+          name={this.state.fav ? "star" : "star-border"}
+          type='material'
+          color='#f50'
+          onPress={() => this.favourite(movieId)}/>
         <Text style={{marginBottom: 10}}>
           { moviePlot }
         </Text>
