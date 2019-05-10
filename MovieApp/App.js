@@ -29,6 +29,10 @@ const instructions = Platform.select({
 
 const fireBase = firebase.initializeApp(firebaseConfig);
 class SearchScreen extends React.Component {
+  static navigationOptions = {
+    title: 'Movie Search',
+  };
+
   state = {
     movies: [],
     search: "",
@@ -51,7 +55,7 @@ class SearchScreen extends React.Component {
   }
 
   fetchMovies = title => {
-    fetch(API_URL + "?s=" + title + "&type=&apikey=" + API_KEY)
+    fetch(API_URL + "?s=" + title + "&type=movie&apikey=" + API_KEY)
      .then(res => res.json())
      .then(moviesJson => {
        let searchResults = moviesJson['Search'];
@@ -104,10 +108,15 @@ class SearchScreen extends React.Component {
 }
 
 class MovieDetailsScreen extends React.Component {
+  static navigationOptions = {
+    title: 'Movie Details',
+  };
+  
   constructor() {
     super()
     this.isFav = this.isFav.bind(this)
-}
+  }
+
   state = {
     fav: false,
   }
@@ -133,15 +142,14 @@ class MovieDetailsScreen extends React.Component {
       year: movieYear,
       poster: moviePoster
     }));
-
   }
 
   isFav(id) {
     let movieFav = true;
     var isFav = firebase.database().ref('movies/' + id + '/favourite');
     isFav.on('value', function(snapshot) {
-        movieFav = snapshot.val();
-      });
+      movieFav = snapshot.val();
+    });
     this.setState({fav: movieFav});
   }
 
@@ -157,21 +165,25 @@ class MovieDetailsScreen extends React.Component {
     const moviePoster = navigation.getParam('poster');
 
     return (
-      <Card
-        title={movieTitle + " " + "(" + movieYear + ")"}
-        
-        image={{ uri: moviePoster }}>
-        
-        <Icon
-          raised
-          name={this.state.fav ? "star" : "star-border"}
-          type='material'
-          color='#f50'
-          onPress={() => this.favourite(movieId)}/>
-        <Text style={{marginBottom: 10}}>
-          { moviePlot }
-        </Text>
-      </Card>
+      <ScrollView>
+        <Card
+          title={ movieTitle + " " + "(" + movieYear + ")" }
+          image={{ uri: moviePoster }}>
+          <Text style={{marginBottom: 10, fontSize: 16}}>
+            { moviePlot }
+          </Text>
+          <Text style={{ marginBottom: 10, fontSize: 16 }}>
+            Runtime: { movieRunTime }
+          </Text>
+          <Icon
+            raised
+            name={this.state.fav ? "star" : "star-border"}
+            type='material'
+            color='#f50'
+            containerStyle={{ flexDirection: 'row-reverse' }}
+            onPress={() => this.favourite(movieId)}/>
+        </Card>
+      </ScrollView>
     );
   }
 }
@@ -182,7 +194,16 @@ const AppNavigator = createStackNavigator(
     Details: MovieDetailsScreen
   }, 
   {
-    initialRouteName: 'Search'
+    initialRouteName: 'Search',
+    defaultNavigationOptions: {
+      headerStyle: {
+        backgroundColor: '#008ad3',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      },
+    },
   }
 );
 
