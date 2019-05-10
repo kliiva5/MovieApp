@@ -243,6 +243,88 @@ class FavouriteMovies extends Component {
   }
 }
 
+ 
+class HomeScreen extends React.Component {
+  static navigationOptions = {
+    title: 'Home',
+  };
+   render() {
+    return (
+      <View style={styles.container}>
+        <Text style={{ fontWeight: 'bold', fontSize: 20 }}>
+          Welcome to the MovieApp!
+        </Text>
+        <Text style={{ marginBottom: 10, fontSize: 16 }}>
+          In this app, You can:
+        </Text>
+        <Text style={{ fontSize: 14 }}>
+          <Text style={{ marginBottom: 5, marginTop: 5 }}>{ '\u2022' + " " + "Search for movies" + "\n" }</Text>
+          <Text style={{ marginBottom: 5, marginTop: 5 }}>{ '\u2022' + " " + "And add them to your favourites list for tracking" }              </Text>
+        </Text>
+      </View>
+    )
+  }
+}
+
+const HomeStack = createStackNavigator(
+  {
+    Home: HomeScreen
+  },
+  {
+    initialRouteName: 'Home',
+    defaultNavigationOptions: {
+      headerStyle: {
+        backgroundColor: '#008ad3',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      },
+    },
+  }
+)
+ 
+class AboutScreen extends React.Component {
+  static navigationOptions = {
+    title: 'About',
+  };
+ render() {
+    return (
+      <View style={styles.container}>
+        <Text style={{ fontSize: 18, marginBottom: 10, fontWeight: 'bold' }}>
+          Made by:
+        </Text>
+        <Text style={{ fontSize: 16 }}>
+          <Text style={{ marginBottom: 5 }}>{ "Stanislav Majevski" + "\n" }</Text>
+          <Text style={{ marginBottom: 5 }}>{ "Kristjan Liiva" + "\n" }</Text>
+          <Text style={{ marginBottom: 5 }}>{ "Uku Põder" + "\n" }</Text>
+          <Text style={{ marginBottom: 5 }}>{ "Elle Elisa Ivantšikova" + "\n" }</Text>
+        </Text>
+      </View>
+    )
+  }
+}
+
+const AboutStack = createStackNavigator(
+  {
+    About: AboutScreen
+  },
+  {
+    initialRouteName: 'About',
+    defaultNavigationOptions: {
+      headerStyle: {
+        backgroundColor: '#008ad3',
+      },
+      headerTintColor: '#fff',
+      headerTitleStyle: {
+        fontWeight: 'bold',
+      },
+    },
+  }
+)
+
+
+
 const AppNavigator = createStackNavigator(
   {
     Search: SearchScreen,
@@ -293,8 +375,10 @@ const styles = StyleSheet.create({
 
 export default createAppContainer(createBottomTabNavigator(
   {
+    Home: HomeStack,
     Search: AppNavigator,
     Favourites: FavouriteMovies, //still needs FavMovies not MovieDetailsScreen
+    About: AboutStack,
   },
   {
     defaultNavigationOptions: ({ navigation }) => ({
