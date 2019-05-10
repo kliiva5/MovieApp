@@ -11,6 +11,7 @@ import { SearchBar, ListItem, Card, Icon } from 'react-native-elements';
 import { Platform, StyleSheet, View, ScrollView, Text, Button } from 'react-native';
 import { createStackNavigator, createAppContainer, StackActions, NavigationActions, createBottomTabNavigator } from 'react-navigation'
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import PropTypes from 'prop-types';
 
 import {firebaseConfig, API_KEY, API_URL} from './config';
 
@@ -29,6 +30,7 @@ const instructions = Platform.select({
 });
 
 const fireBase = firebase.initializeApp(firebaseConfig);
+
 class SearchScreen extends React.Component {
   static navigationOptions = {
     title: 'Movie Search',
@@ -189,6 +191,58 @@ class MovieDetailsScreen extends React.Component {
   }
 }
 
+
+class ItemComponent extends Component {
+  static propTypes = {
+    items: PropTypes.array.isRequired
+  };
+
+  render() {
+    return (
+      <View style={styles.itemsList}>
+      {this.props.items.map((item, index) => {
+        return (
+          <View key={index}>
+          <Text style={styles.itemtext}>{item.title}</Text>
+          </View>
+        );
+      })}
+      </View>
+    );
+  }
+}
+
+
+const db = fireBase.database();
+
+let moviesRef = db.ref('/movies');
+
+class FavouriteMovies extends Component {
+  state = {
+    items: []
+  };
+
+  componentDidMount() {
+    moviesRef.on('value', snapshot => {
+      let data = snapshot.val();
+      let items = Object.values(data);
+      this.setState({ items });
+    });
+  }
+
+  render() {
+    return (
+      <View style={styles.container}>
+        {this.state.items.length > 0 ? (
+          <ItemComponent items={this.state.items} />
+        ) : (
+          <Text>No movies</Text>
+        )}
+      </View>
+    );
+  }
+}
+
 const AppNavigator = createStackNavigator(
   {
     Search: SearchScreen,
@@ -224,13 +278,23 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#333333',
     marginBottom: 5,
+  },
+  itemsList: {
+    flex: 1,
+    flexDirection: 'column',
+    justifyContent: 'space-around'
+  },
+  itemtext: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center'
   }
 });
 
 export default createAppContainer(createBottomTabNavigator(
   {
     Search: AppNavigator,
-    Favourites: AppNavigator, //still needs FavMovies not MovieDetailsScreen
+    Favourites: FavouriteMovies, //still needs FavMovies not MovieDetailsScreen
   },
   {
     defaultNavigationOptions: ({ navigation }) => ({
