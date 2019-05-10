@@ -240,13 +240,14 @@ class FavouriteMovies extends Component {
 
   render() {
     return (
-      <View style={styles.container}>
+      <ScrollView contentContainerStyle={styles.container}>
         {this.state.items.length > 0 ? (
-          <ItemComponent items={this.state.items} />
+          <ItemComponent items={this.state.items}
+           />
         ) : (
           <Text>No movies</Text>
         )}
-      </View>
+      </ScrollView>
     );
   }
 }
@@ -394,10 +395,14 @@ export default createAppContainer(createBottomTabNavigator(
         const { routeName } = navigation.state;
         let IconComponent = Ionicons;
         let iconName;
-        if (routeName === 'Search'){
-          iconName = `ios-search`;
-        } else if (routeName === 'Favourites') {
-          iconName = 'ios-star';
+        if (routeName === 'Home'){
+          iconName = `ios-home`;
+        } else if (routeName === 'Search') {
+          iconName = 'ios-search';
+        } else if (routeName === 'Favourites'){
+          iconName = `ios-star`;
+        } else if (routeName === 'About') {
+          iconName = 'ios-information-circle';
         }
 
         return <IconComponent name={iconName} size={25} color={tintColor} />;
