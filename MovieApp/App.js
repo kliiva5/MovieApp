@@ -8,9 +8,8 @@
 
 import React, {Component} from 'react';
 import { SearchBar, ListItem, Card, Icon } from 'react-native-elements';
-import { Platform, StyleSheet, View, ScrollView, Text, FlatList } from 'react-native';
-import { createStackNavigator, createAppContainer, StackActions, NavigationActions, createBottomTabNavigator } from 'react-navigation';
-import Ionicons from 'react-native-vector-icons/Ionicons';
+import { Platform, StyleSheet, View, ScrollView, Text, Button } from 'react-native';
+import { createStackNavigator, createAppContainer, StackActions, NavigationActions } from 'react-navigation'
 
 import {firebaseConfig, API_KEY, API_URL} from './config';
 
@@ -29,7 +28,6 @@ const instructions = Platform.select({
 });
 
 const fireBase = firebase.initializeApp(firebaseConfig);
-
 class SearchScreen extends React.Component {
   static navigationOptions = {
     title: 'Movie Search',
@@ -228,35 +226,4 @@ const styles = StyleSheet.create({
   }
 });
 
-//export default createAppContainer(AppNavigator);
-
-export default createAppContainer(createBottomTabNavigator(
-  {
-    Search: SearchScreen,
-    Details: MovieDetailsScreen,
-    Favourites: MovieDetailsScreen //still needs FavMovies not MovieDetailsScreen
-  },
-  {
-    defaultNavigationOptions: ({ navigation }) => ({
-      tabBarIcon: ({ focused, horizontal, tintColor}) => {
-        const { routeName } = navigation.state;
-        let IconComponent = Ionicons;
-        let iconName;
-        if (routeName === 'Search'){
-          iconName = `ios-search`;
-        } else if (routeName === 'Details') {
-          iconName = 'ios-list';
-        } else if (routeName === 'Favourites') {
-          iconName = 'ios-star';
-        }
-
-        return <IconComponent name={iconName} size={25} color={tintColor} />;
-      },
-    }),
-    tabBarOptions: {
-      activeTintColor: 'blue',
-      inactiveTintColor: 'gray',
-    },
-
-  }
-));
+export default createAppContainer(AppNavigator);
