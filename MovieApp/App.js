@@ -225,10 +225,18 @@ class FavouriteMovies extends Component {
   componentDidMount() {
     moviesRef.on('value', snapshot => {
       let data = snapshot.val();
+      let favouriteMovies = [];
       let items = Object.values(data);
-      this.setState({ items });
+      for(let i=0; i < items.length; i++){
+        if(items[i].favourite === true) {
+          favouriteMovies.push(items[i]);
+        }
+      }
+      this.setState({ items: favouriteMovies });
+
     });
   }
+
 
   render() {
     return (
