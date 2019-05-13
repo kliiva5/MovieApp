@@ -1,6 +1,6 @@
 # MovieApp
 ## Üldine info
-Tegemist on mobiilirakendusega mille kaudu saab otsida filme ja lisada neid lemmikutesse. Idee tekkis kuna kõigil on filme mida keegi soovitab või ise tahaks vaadata kuid läheb meelest ära, antud App aitab sellest murest lahti saada. Igal filmil on olemas detail-vaade. Valisime React-Native arenduseks kuna tundus huvitav ja annab võimaluse juurde õppida.
+Tegemist on mobiilirakendusega mille kaudu saab otsida filme ja lisada neid lemmikutesse. Idee tekkis kuna kõigil on filme mida keegi soovitab või ise tahaks vaadata kuid läheb meelest ära, antud App aitab sellest murest lahti saada. Igal filmil on olemas detail-vaade. Valisime React-Native platvormi arenduseks kuna tundus huvitav ja annab võimaluse juurde õppida.
 
 ## Alla laadimine
 Rakenduse testimiseks tuleks endale antud rakendus alla laadida .zip failina ( ning lahti pakkida ) või siis käsureal:
@@ -16,6 +16,10 @@ npm install
 
 Rakenduse käivitamiseks tuleb Android studio tööle panna ja avada MovieApp/android kaust. Käsureal olles samas kaustas us npm install sai tehtud, sisestada käsk : 
 ```
+react-native run-android
+```
+Või juhul kui emulaator juba töötab
+```
 npm start
 ```
 
@@ -26,6 +30,14 @@ Android studios käivitada emulaator kuhu ilmub rakendus.
 * [React](https://reactjs.org/docs/getting-started.html) - Kasutajaliides
 * [React Navigation](https://reactnavigation.org/docs/en/getting-started.html) - Rakenduse siseseks navigeerimiseks
 * [React-Native](https://facebook.github.io/react-native/docs/getting-started) - Platvorm millega rakendus loodi
+
+## Liikmete panus
+* Stanislav - Andmebaasi lisamine(lemmikud) ja algseadistus
+* Kristjan - Peaaegu kõikides teemades abistamine ja esimene seadistus
+* Uku - Details page demo ja abistamine + readme
+* Elle - Lemmikute filmide kuvamine ja lisamine, tab vaade
+
+
 
 ## Pildid projekti vaadetest
 ![home_page](https://www.upload.ee/image/9945200/homepage.png)
