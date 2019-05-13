@@ -40,7 +40,8 @@ Android studios käivitada emulaator kuhu ilmub rakendus.
 
 
 ## Pildid projekti vaadetest
-![home_page](https://www.upload.ee/image/9945200/homepage.png)
-![movielist_page](https://www.upload.ee/image/9945204/movielist.png)
-![moviedetails_page](https://www.upload.ee/image/9945202/moviedetails.png)
-![about_page](https://www.upload.ee/image/9945191/aboutpage.png)
+![home_page](https://www.upload.ee/image/9958672/Screenshot_2019-05-13_at_20.08.28.png)
+![search_page](https://www.upload.ee/image/9958679/Screenshot_2019-05-13_at_20.11.25.png)
+![moviedetails_page](https://www.upload.ee/image/9958683/Screenshot_2019-05-13_at_20.12.53.png)
+![favourites_page](https://www.upload.ee/image/9958684/Screenshot_2019-05-13_at_20.13.42.png)
+![about_page](https://www.upload.ee/image/9958685/Screenshot_2019-05-13_at_20.13.49.png)
